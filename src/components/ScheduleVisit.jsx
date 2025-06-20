@@ -15,7 +15,7 @@ const ScheduleVisit = ({ projectTitle }) => {
     e.preventDefault();
 
     const data = new FormData();
-    data.append('access_key', 'YOUR_WEB3FORMS_KEY_HERE');
+    data.append('access_key', '71c734b2-cdc2-40e0-83e0-7407417a5873');
     data.append('Name', formData.name);
     data.append('Email', formData.email);
     data.append('Message', `Visit request for ${projectTitle} on ${selectedDate?.toLocaleString()} — ${formData.message}`);
