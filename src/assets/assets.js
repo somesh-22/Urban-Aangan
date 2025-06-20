@@ -13,7 +13,7 @@ import project_img_3 from './project_img_3.jpg';
 import project_img_4 from './project_img_4.jpg';
 import project_img_5 from './project_img_5.jpg';
 import project_img_6 from './project_img_6.jpg';
-import profile_img_1 from './Manas.png.png';
+import profile_img_1 from './manas.png';
 import profile_img_2 from './sweta.png';
 import profile_img_3 from './DP.jpg';
 
