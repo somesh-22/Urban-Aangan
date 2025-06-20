@@ -1,4 +1,4 @@
-import logo from './logo.svg';
+import logo from './logo2.svg';
 import logo_dark from './Aangan.svg'; // This is your Aangan logo
 import cross_icon from './cross_icon.svg';
 import menu_icon from './menu_icon.svg';
