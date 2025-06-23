@@ -1,75 +1,112 @@
-import React from 'react'
+import React, { useState } from 'react';
 import { toast } from 'react-toastify';
-import { motion } from 'framer-motion';
 
 const Contact = () => {
+  const [form, setForm] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    message: '',
+  });
 
-    const [result, setResult] = React.useState("");
+  const [submitting, setSubmitting] = useState(false);
 
-    const onSubmit = async (event) => {
-      event.preventDefault();
-      setResult("Sending....");
-      const formData = new FormData(event.target);
-  
-      // Enter your Web3Forms Access Key below
-      formData.append("access_key", "71c734b2-cdc2-40e0-83e0-7407417a5873");
-  
-      const response = await fetch("https://api.web3forms.com/submit", {
-        method: "POST",
-        body: formData
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    setSubmitting(true);
+
+    try {
+      const res = await fetch('http://localhost:5000/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
       });
-  
-      const data = await response.json();
-  
-      if (data.success) {
-        setResult("");
-        toast.success("Form Submitted Successfully")
-        event.target.reset();
+
+      if (res.ok) {
+        toast.success("Message submitted successfully!");
+        setForm({ name: '', email: '', phone: '', message: '' });
       } else {
-        console.log("Error", data);
-        toast.error(data.message)
-        setResult("");
+        toast.error("Submission failed. Try again.");
       }
-    };
+    } catch (error) {
+      console.error(error);
+      toast.error("Server error.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
-    <motion.div
-      initial={{opacity: 0, x:-200}}
-      transition={{duration: 1}}
-      whileInView={{opacity: 1, x:0}}
-      viewport={{once: true}}
-    className='text-center p-6 py-20 lg:px-32 w-full overflow-hidden' id='Contact'>
-      <h1 className='text-2xl sm:text-4xl font-bold mb-2 text-center'>Contact <span className='underline underline-offset-4 decoration-1 under font-light'>With Us</span></h1>
-      <p className='text-center text-gray-500 mb-12 max-w-80 mx-auto'>Ready to Make a Move? Let’s Build Your Future Together</p>
+    <div className="max-w-2xl mx-auto px-4 py-10" id="Contact">
+      <h2 className="text-3xl font-bold text-center mb-8">Contact Us</h2>
 
-<form onSubmit={onSubmit} className='max-w-2xl mx-auto text-gray-600 pt-8'>
-    <div className='flex flex-wrap'>
-        <div className='w-full md:w-1/2 text-left'>
-            Your Name
-            <input className='w-full border border-gray-300 rounded py-3 px-4 mt-2' type="text" name='Name' placeholder='Your Name' required/>
+      <form onSubmit={onSubmit} className="space-y-6">
+        <div>
+          <label className="block text-sm font-medium mb-1">Your Name</label>
+          <input
+            name="name"
+            value={form.name}
+            onChange={handleChange}
+            required
+            placeholder="John Doe"
+            className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          />
         </div>
-        <div className='w-full md:w-1/2 text-left md:pl-4'>
-            Your Email
-            <input className='w-full border border-gray-300 rounded py-3 px-4 mt-2' type="email" name='Email' placeholder='Your Email' required/>
+
+        <div>
+          <label className="block text-sm font-medium mb-1">Your Email</label>
+          <input
+            name="email"
+            type="email"
+            value={form.email}
+            onChange={handleChange}
+            required
+            placeholder="you@example.com"
+            className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          />
         </div>
-        <div className='w-full text-left'>
-  Phone Number
-  <input type="tel" name="Phone" className='w-full border border-gray-300 rounded py-3 px-4 mt-2' placeholder='Phone Number' />
-</div>
 
+        <div>
+          <label className="block text-sm font-medium mb-1">Phone</label>
+          <input
+            name="phone"
+            type="tel"
+            value={form.phone}
+            onChange={handleChange}
+            placeholder="9876543210"
+            className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-1">Message</label>
+          <textarea
+            name="message"
+            value={form.message}
+            onChange={handleChange}
+            required
+            rows="5"
+            placeholder="Write your message here..."
+            className="w-full border border-gray-300 rounded px-4 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-blue-400"
+          />
+        </div>
+
+        <div className="text-center pt-4">
+          <button
+            type="submit"
+            disabled={submitting}
+            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded transition"
+          >
+            {submitting ? "Sending..." : "Send Message"}
+          </button>
+        </div>
+      </form>
     </div>
-    <div className='my-6 text-left'>
-        Message
-        <textarea className='w-full border border-gray-300 rounded py-3 px-4 mt-2 h-48 resize-none'
-        name="Message" placeholder='Message' required></textarea>
-    </div>
-    <button className='bg-blue-600 text-white py-2 px-12 mb-10 rounded'>
-        {result ? result : "Send Message"}</button>
-</form>
+  );
+};
 
-
-    </motion.div>
-  )
-}
-
-export default Contact
+export default Contact;

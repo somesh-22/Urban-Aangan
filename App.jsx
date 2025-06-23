@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+// src/App.jsx
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
 import Header from './components/Header';
@@ -13,17 +14,30 @@ import ChatIcon from './components/Chatbot/ChatIcon';
 
 import Login from './components/Admin/Login';
 import Dashboard from './components/Admin/Dashboard';
-import { isAuthenticated } from './utils/auth';
+import { auth } from './firebase';
+import { onAuthStateChanged } from 'firebase/auth';
 
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-const PrivateRoute = ({ children }) => {
-  return isAuthenticated() ? children : <Navigate to="/admin/login" />;
+const PrivateRoute = ({ children, user }) => {
+  return user ? children : <Navigate to="/admin/login" />;
 };
 
 const App = () => {
-  const [showChat, setShowChat] = useState(false); // state to control chatbot visibility
+  const [showChat, setShowChat] = useState(false);
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      setLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  if (loading) return <div className="text-center mt-20">Loading...</div>;
 
   return (
     <Router>
@@ -52,7 +66,7 @@ const App = () => {
           <Route
             path="/admin/dashboard"
             element={
-              <PrivateRoute>
+              <PrivateRoute user={user}>
                 <Dashboard />
               </PrivateRoute>
             }

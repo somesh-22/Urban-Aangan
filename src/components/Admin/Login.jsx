@@ -1,49 +1,79 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebase/auth';
+import { auth } from '../../firebase';
 import { useNavigate } from 'react-router-dom';
-import { login } from '../../utils/auth';
+import { toast } from 'react-toastify';
 
 const Login = () => {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [loggedIn, setLoggedIn] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setLoggedIn(!!user);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const handleLogin = async (e) => {
     e.preventDefault();
-    const success = login(username, password);
-    if (success) {
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      toast.success('Login successful!');
       navigate('/admin/dashboard');
-    } else {
-      setError('Invalid credentials');
+    } catch (error) {
+      toast.error(`Login failed: ${error.message}`);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      toast.info('Logged out');
+      setLoggedIn(false);
+    } catch (error) {
+      toast.error(`Logout failed: ${error.message}`);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <form className="bg-white p-6 rounded shadow-md" onSubmit={handleLogin}>
-        <h2 className="text-2xl mb-4">Admin Login</h2>
-        {error && <p className="text-red-500">{error}</p>}
-        <input
-          type="text"
-          placeholder="Username"
-          className="block w-full border px-3 py-2 mb-4"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          className="block w-full border px-3 py-2 mb-4"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
+    <div className="max-w-md mx-auto mt-20 bg-white shadow-lg rounded p-6">
+      <h2 className="text-2xl font-bold mb-4 text-center">
+        {loggedIn ? 'Already Logged In' : 'Admin Login'}
+      </h2>
+
+      {loggedIn ? (
         <button
-          type="submit"
-          className="w-full bg-blue-600 text-white py-2 rounded"
+          onClick={handleLogout}
+          className="w-full bg-red-500 text-white py-2 rounded hover:bg-red-600"
         >
-          Login
+          Logout
         </button>
-      </form>
+      ) : (
+        <form onSubmit={handleLogin}>
+          <input
+            type="email"
+            placeholder="Email"
+            className="border p-2 mb-4 w-full rounded"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            className="border p-2 mb-4 w-full rounded"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+          <button type="submit" className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600">
+            Login
+          </button>
+        </form>
+      )}
     </div>
   );
 };

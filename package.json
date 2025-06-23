@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "emailjs-com": "^3.2.0",
+    "firebase": "^11.9.1",
     "framer-motion": "^11.11.11",
     "lucide-react": "^0.514.0",
     "react": "^18.3.1",
