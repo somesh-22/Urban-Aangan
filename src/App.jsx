@@ -10,7 +10,7 @@ import Footer from './components/Footer';
 import Chatbot from './components/Chatbot/Chatbot';
 import ChatIcon from './components/Chatbot/ChatIcon';
 
-import Login from './components/Admin/login';
+import Login from './components/Admin/Login';
 import Dashboard from './components/Admin/Dashboard';
 import PrivateRoute from './components/Admin/PrivateRoute';
 
